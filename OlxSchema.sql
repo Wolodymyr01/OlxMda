@@ -41,6 +41,7 @@ create table DimMarket
 	MarketKey int primary key identity(1,1),
 	MarketLabel nvarchar(16) not null
 )
+go
 
 if not exists (select 1 from sysobjects where name='DimProperty' and xtype='U')
 create table DimProperty
@@ -52,6 +53,7 @@ create table DimProperty
 	AreaCode int null,
 	RoomsCategory nvarchar(2) not null,
 )
+go
 
 if not exists (select 1 from sysobjects where name='FactOfferSnapshot' and xtype='U')
 create table FactOfferSnapshot
@@ -64,3 +66,4 @@ create table FactOfferSnapshot
 	Area float null,
 	Price float not null
 )
+go
