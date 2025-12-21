@@ -1,6 +1,6 @@
 # OLX MDA — Star Schema Preparation
 
-This repository contains a minimal ETL setup (T-SQL) to build a star schema for market data analysis (MDA) from a flat CSV export of OLX housing offers.
+This repository contains a minimal ETL setup (T-SQL) to build a star schema for multidimensional analysis (MDA) from a flat CSV export of OLX housing offers.
 
 Files
 - `olx_house_price_Q122.csv` — source CSV with raw OLX offers (quarterly snapshot).
