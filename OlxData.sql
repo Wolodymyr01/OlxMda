@@ -75,19 +75,20 @@ select distinct
     [year] * 100 + monthNumeric,
     monthNumeric,
     [month],
-    [month] + ' 2022',
+    [month] + ' ' + cast([year] as nvarchar(4)),
     case
         when monthNumeric between 1 and 3 then 1
         when monthNumeric between 4 and 6 then 2
         when monthNumeric between 7 and 9 then 3
         else 4
     end,
+    concat(
     case
         when monthNumeric between 1 and 3 then 'Q1'
         when monthNumeric between 4 and 6 then 'Q2'
         when monthNumeric between 7 and 9 then 'Q3'
         else 'Q4'
-    end
+    end, ' ', cast([year] as nvarchar(4)))
 from ParsedDate
 order by 2
 
