@@ -7,87 +7,100 @@ on:
     branches: [ main, develop ]
 
 env:
-  SA_PASSWORD: ${{ secrets.MSSQL_SA_PASSWORD || 'Tr0pic@lPassword#2024!' }}
+  SA_PASSWORD: Tr0pic@lPassword#2024!
 
 jobs:
   lint:
     name: Lint Code
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      
+      - uses: actions/checkout@v4
+
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.9'
-      
+
       - name: Install flake8
         run: pip install flake8
-      
+
       - name: Lint Python code
-        run: |
-          # Stop the build if there are Python syntax errors
-          flake8 ImportOlxHousePrice.py --count --select=E9,F63,F7,F82 --show-source --statistics
-          # Exit-zero treats all errors as warnings
-          flake8 ImportOlxHousePrice.py --count --exit-zero --max-line-length=127 --statistics
         working-directory: OlxMda
+        run: |
+          flake8 ImportOlxHousePrice.py --count --select=E9,F63,F7,F82 --show-source --statistics
+          flake8 ImportOlxHousePrice.py --count --exit-zero --max-line-length=127 --statistics
         continue-on-error: true
 
   test:
     name: Test Pipeline
     runs-on: ubuntu-latest
     needs: lint
-    
+    timeout-minutes: 30
+
     services:
       mssql:
         image: mcr.microsoft.com/mssql/server:2019-latest
         env:
-          SA_PASSWORD: ${{ secrets.MSSQL_SA_PASSWORD || 'Tr0pic@lPassword#2024!' }}
+          SA_PASSWORD: ${{ env.SA_PASSWORD }}
           ACCEPT_EULA: Y
           MSSQL_PID: Express
-        options: >-
-          --health-cmd="/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P \"$SA_PASSWORD\" -Q 'SELECT 1' || exit 1"
-          --health-interval=20s
-          --health-timeout=30s
-          --health-retries=20
         ports:
           - 1433:1433
-    
+        options: >-
+          --health-cmd "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P $SA_PASSWORD -Q 'SELECT 1' || exit 1"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 30
+
     steps:
-      - uses: actions/checkout@v3
-      
+      - uses: actions/checkout@v4
+
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.9'
-      
-      - name: Install dependencies
+
+      - name: Install OS deps (ODBC)
         run: |
-          pip install pyodbc
+          sudo apt-get update
+          sudo apt-get install -y unixodbc-dev
+
+      - name: Install Python deps
         working-directory: OlxMda
-      
-      - name: Wait for SQL Server
         run: |
-          for i in {1..30}; do
-            sqlcmd -S localhost -U sa -P "${{ env.SA_PASSWORD }}" -Q "SELECT 1" && break || sleep 1
+          pip install --upgrade pip
+          pip install pyodbc
+
+      - name: Wait for SQL Server (inside container)
+        run: |
+          cid="${{ job.services.mssql.id }}"
+          for i in {1..60}; do
+            if docker exec "$cid" /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P "${{ env.SA_PASSWORD }}" -Q "SELECT 1" >/dev/null 2>&1; then
+              echo "SQL Server is ready"
+              exit 0
+            fi
+            sleep 2
           done
-        continue-on-error: true
-      
-      - name: Create database
+          echo "SQL Server did not become ready in time"
+          docker logs "$cid" || true
+          exit 1
+
+      - name: Create database (inside container)
         run: |
-          sqlcmd -S localhost -U sa -P "${{ env.SA_PASSWORD }}" -Q "CREATE DATABASE OlxQa"
-        continue-on-error: true
-      
+          cid="${{ job.services.mssql.id }}"
+          docker exec "$cid" /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P "${{ env.SA_PASSWORD }}" -Q "IF DB_ID('OlxQa') IS NULL CREATE DATABASE OlxQa"
+
       - name: Run import pipeline
-        run: |
-          python ImportOlxHousePrice.py --server localhost --database OlxQa
         working-directory: OlxMda
         env:
           PYTHONUNBUFFERED: 1
-      
+        run: |
+          python ImportOlxHousePrice.py --server localhost --database OlxQa
+
       - name: Verify fact table
         run: |
-          result=$(sqlcmd -S localhost -U sa -P "${{ env.SA_PASSWORD }}" -d OlxQa -Q "SET NOCOUNT ON; SELECT COUNT(*) FROM FactOfferSnapshot")
+          cid="${{ job.services.mssql.id }}"
+          result=$(docker exec "$cid" /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P "${{ env.SA_PASSWORD }}" -d OlxQa -Q "SET NOCOUNT ON; SELECT COUNT(*) FROM FactOfferSnapshot")
           count=$(echo "$result" | tail -1 | xargs)
           echo "Fact table row count: $count"
           if [ "$count" -eq 0 ]; then
@@ -95,7 +108,7 @@ jobs:
             exit 1
           fi
           echo "✓ Data validation passed"
-      
+
       - name: Generate report
         if: always()
         run: |
