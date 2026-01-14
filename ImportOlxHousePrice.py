@@ -226,8 +226,10 @@ def execute_sql_file(cursor, filepath, description):
         with open(filepath, 'r', encoding='utf-8') as f:
             sql_content = f.read()
         
-        # Split by GO statements (SQL Server batch separator)
-        batches = sql_content.split('\ngo\n')
+        # Split by GO statements (SQL Server batch separator, case-insensitive)
+        # GO is not valid T-SQL, it's a command tool directive, so we need to remove it
+        import re
+        batches = re.split(r'\ngo\s*$', sql_content, flags=re.MULTILINE | re.IGNORECASE)
         
         for batch in batches:
             batch = batch.strip()
