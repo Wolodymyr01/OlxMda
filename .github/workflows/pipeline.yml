@@ -43,10 +43,9 @@ jobs:
         image: mcr.microsoft.com/mssql/server:2019-latest
         env:
           ACCEPT_EULA: Y
-          SA_PASSWORD: ${{ env.SA_PASSWORD }}
           MSSQL_PID: Express
         options: >-
-          --health-cmd="/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P '${{ env.SA_PASSWORD }}' -Q 'SELECT 1' || exit 1"
+          --health-cmd="/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P \"$SA_PASSWORD\" -Q 'SELECT 1' || exit 1"
           --health-interval=10s
           --health-timeout=30s
           --health-retries=10
@@ -69,13 +68,13 @@ jobs:
       - name: Wait for SQL Server
         run: |
           for i in {1..30}; do
-            sqlcmd -S localhost -U sa -P '${{ env.SA_PASSWORD }}' -Q "SELECT 1" && break || sleep 1
+            sqlcmd -S localhost -U sa -P "${{ env.SA_PASSWORD }}" -Q "SELECT 1" && break || sleep 1
           done
         continue-on-error: true
       
       - name: Create database
         run: |
-          sqlcmd -S localhost -U sa -P '${{ env.SA_PASSWORD }}' -Q "CREATE DATABASE OlxQa"
+          sqlcmd -S localhost -U sa -P "${{ env.SA_PASSWORD }}" -Q "CREATE DATABASE OlxQa"
         continue-on-error: true
       
       - name: Run import pipeline
@@ -87,7 +86,7 @@ jobs:
       
       - name: Verify fact table
         run: |
-          result=$(sqlcmd -S localhost -U sa -P '${{ env.SA_PASSWORD }}' -d OlxQa -Q "SET NOCOUNT ON; SELECT COUNT(*) FROM FactOfferSnapshot")
+          result=$(sqlcmd -S localhost -U sa -P "${{ env.SA_PASSWORD }}" -d OlxQa -Q "SET NOCOUNT ON; SELECT COUNT(*) FROM FactOfferSnapshot")
           count=$(echo "$result" | tail -1 | xargs)
           echo "Fact table row count: $count"
           if [ "$count" -eq 0 ]; then
