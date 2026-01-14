@@ -7,13 +7,14 @@ Handles locale-independent number parsing and robust error handling.
 import csv
 import pyodbc
 import sys
+import argparse
 from pathlib import Path
 from decimal import InvalidOperation
 
-# Configuration
+# Configuration - can be overridden by command-line arguments
 CSV_FILE = "olx_house_price_Q122.csv"
-SERVER = "."
-DATABASE = "OlxQa"
+DEFAULT_SERVER = "."
+DEFAULT_DATABASE = "OlxQa"
 TABLE_NAME = "[dbo].[olx_house_price]"
 
 # Column mappings and type conversions
@@ -243,19 +244,23 @@ def execute_sql_file(cursor, filepath, description):
         raise
 
 
-def main():
+def main(server=None, database=None):
     """Main execution."""
     try:
+        # Use provided arguments or defaults
+        sql_server = server or DEFAULT_SERVER
+        sql_database = database or DEFAULT_DATABASE
+        
         print("=" * 70)
         print("CSV to SQL Server Importer")
         print("=" * 70)
         
         # Connect to SQL Server
         print(f"\nConnecting to SQL Server...")
-        print(f"  Server: {SERVER}")
-        print(f"  Database: {DATABASE}")
+        print(f"  Server: {sql_server}")
+        print(f"  Database: {sql_database}")
         
-        conn_string = f"Driver={{ODBC Driver 17 for SQL Server}};Server={SERVER};Database={DATABASE};Trusted_Connection=yes;"
+        conn_string = f"Driver={{ODBC Driver 17 for SQL Server}};Server={sql_server};Database={sql_database};Trusted_Connection=yes;"
         conn = pyodbc.connect(conn_string)
         cursor = conn.cursor()
         
@@ -281,20 +286,37 @@ def main():
         # Execute data script
         execute_sql_file(cursor, "OlxData.sql", "OlxData.sql")
         
+        # Verify fact table is not empty
+        print("\nVerifying data...")
+        cursor.execute("SELECT COUNT(*) FROM FactOfferSnapshot")
+        fact_count = cursor.fetchone()[0]
+        
+        if fact_count > 0:
+            print(f"✓ Fact table contains {fact_count} records")
+        else:
+            print("✗ Fact table is empty!")
+            raise Exception("Fact table is empty after import")
+        
         cursor.close()
         conn.close()
         
         print("\n" + "=" * 70)
         print("Import completed successfully!")
         print("=" * 70)
+        return 0
         
     except pyodbc.Error as e:
         print(f"\n✗ Database error: {e}")
-        sys.exit(1)
+        return 1
     except Exception as e:
         print(f"\n✗ Error: {e}")
-        sys.exit(1)
+        return 1
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description="Import OLX house price data to SQL Server")
+    parser.add_argument("--server", default=DEFAULT_SERVER, help=f"SQL Server name (default: {DEFAULT_SERVER})")
+    parser.add_argument("--database", default=DEFAULT_DATABASE, help=f"Database name (default: {DEFAULT_DATABASE})")
+    
+    args = parser.parse_args()
+    sys.exit(main(args.server, args.database))
