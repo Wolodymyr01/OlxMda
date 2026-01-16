@@ -1,0 +1,159 @@
+﻿<?xml version="1.0"?>
+<DTS:Executable xmlns:DTS="www.microsoft.com/SqlServer/Dts"
+  DTS:refId="Package"
+  DTS:CreationDate="1/15/2026 9:50:44 AM"
+  DTS:CreationName="Microsoft.Package"
+  DTS:CreatorComputerName="EPBYBREW0106"
+  DTS:CreatorName="AzureAD\UladzimirMileika"
+  DTS:DTSID="{C8451727-CAA6-4CF1-B5BA-0AFC251D056A}"
+  DTS:ExecutableType="Microsoft.Package"
+  DTS:LastModifiedProductVersion="17.0.1008.3"
+  DTS:LocaleID="2057"
+  DTS:ObjectName="Package"
+  DTS:PackageType="5"
+  DTS:VersionBuild="10"
+  DTS:VersionGUID="{DE4790C7-7E6E-4737-BAF5-085B54A647F2}">
+  <DTS:Property
+    DTS:Name="PackageFormatVersion">8</DTS:Property>
+  <DTS:ConnectionManagers>
+    <DTS:ConnectionManager
+      DTS:refId="Package.ConnectionManagers[EPBYBREW0106\POMMERNSQL]"
+      DTS:CreationName="OLEDB"
+      DTS:DTSID="{A08EB287-4FF5-428E-8550-DE0F44322DD3}"
+      DTS:ObjectName="EPBYBREW0106\POMMERNSQL">
+      <DTS:PropertyExpression
+        DTS:Name="InitialCatalog">@[$Project::Database]</DTS:PropertyExpression>
+      <DTS:PropertyExpression
+        DTS:Name="ServerName">@[$Project::Server]</DTS:PropertyExpression>
+      <DTS:ObjectData>
+        <DTS:ConnectionManager
+          DTS:ConnectRetryCount="1"
+          DTS:ConnectRetryInterval="5"
+          DTS:ConnectionString="Data Source=EPBYBREW0106\POMMERNSQL;Initial Catalog=OlxDW;Provider=SQLNCLI11.1;Integrated Security=SSPI;Application Name=SSIS-Package-{A08EB287-4FF5-428E-8550-DE0F44322DD3}EPBYBREW0106\POMMERNSQL;Auto Translate=False;" />
+      </DTS:ObjectData>
+    </DTS:ConnectionManager>
+    <DTS:ConnectionManager
+      DTS:refId="Package.ConnectionManagers[EPBYBREW0106\POMMERNSQL.master]"
+      DTS:CreationName="OLEDB"
+      DTS:DTSID="{F30D51E0-BB1C-4CAD-8B9A-1B8B8DC9BC42}"
+      DTS:ObjectName="EPBYBREW0106\POMMERNSQL.master">
+      <DTS:PropertyExpression
+        DTS:Name="ServerName">@[$Project::Server]</DTS:PropertyExpression>
+      <DTS:ObjectData>
+        <DTS:ConnectionManager
+          DTS:ConnectRetryCount="1"
+          DTS:ConnectRetryInterval="5"
+          DTS:ConnectionString="Data Source=EPBYBREW0106\POMMERNSQL;Initial Catalog=master;Provider=SQLNCLI11.1;Integrated Security=SSPI;Application Name=SSIS-Package-{F30D51E0-BB1C-4CAD-8B9A-1B8B8DC9BC42}EPBYBREW0106\POMMERNSQL.master;Auto Translate=False;" />
+      </DTS:ObjectData>
+    </DTS:ConnectionManager>
+    <DTS:ConnectionManager
+      DTS:refId="Package.ConnectionManagers[olx_house_price_Q122.csv]"
+      DTS:CreationName="FILE"
+      DTS:DTSID="{FF2BF453-2EFF-4A37-A4C5-9372F43B3A5D}"
+      DTS:ObjectName="olx_house_price_Q122.csv">
+      <DTS:ObjectData>
+        <DTS:ConnectionManager
+          DTS:ConnectionString="C:\Users\Uladzimir_Mileika\source\repos\OlxMda\olx_house_price_Q122.csv" />
+      </DTS:ObjectData>
+    </DTS:ConnectionManager>
+  </DTS:ConnectionManagers>
+  <DTS:Variables />
+  <DTS:Executables>
+    <DTS:Executable
+      DTS:refId="Package\Execute SQL Task"
+      DTS:CreationName="Microsoft.ExecuteSQLTask"
+      DTS:Description="Execute SQL Task"
+      DTS:DTSID="{AFF8CAB2-0F3A-450E-999E-6E64ADBAFA17}"
+      DTS:ExecutableType="Microsoft.ExecuteSQLTask"
+      DTS:LocaleID="-1"
+      DTS:ObjectName="Execute SQL Task"
+      DTS:ThreadHint="0">
+      <DTS:Variables />
+      <DTS:ObjectData>
+        <SQLTask:SqlTaskData
+          SQLTask:Connection="{F30D51E0-BB1C-4CAD-8B9A-1B8B8DC9BC42}"
+          SQLTask:SqlStatementSource="DECLARE @db sysname = ?;&#xA;&#xA;IF DB_ID(@db) IS NULL&#xA;BEGIN&#xA;    DECLARE @sql nvarchar(max);&#xA;    SET @sql = N'CREATE DATABASE ' + QUOTENAME(@db);&#xA;    EXEC (@sql);&#xA;END&#xA;" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask">
+          <SQLTask:ParameterBinding
+            SQLTask:ParameterName="0"
+            SQLTask:DtsVariableName="$Project::Database"
+            SQLTask:ParameterDirection="Input"
+            SQLTask:DataType="130"
+            SQLTask:ParameterSize="-1" />
+        </SQLTask:SqlTaskData>
+      </DTS:ObjectData>
+    </DTS:Executable>
+    <DTS:Executable
+      DTS:refId="Package\Olx Bulk Insert"
+      DTS:CreationName="Microsoft.BulkInsertTask"
+      DTS:Description="Parse csv and load it into the database"
+      DTS:DTSID="{AEF09A2F-1F4F-4948-885C-B3BD3E579F53}"
+      DTS:ExecutableType="Microsoft.BulkInsertTask"
+      DTS:LocaleID="-1"
+      DTS:ObjectName="Olx Bulk Insert"
+      DTS:ThreadHint="0">
+      <DTS:Variables />
+      <DTS:ObjectData>
+        <BulkInsertTask:BulkInsertTaskData
+          BulkInsertTask:SourceConnectionName="{FF2BF453-2EFF-4A37-A4C5-9372F43B3A5D}"
+          BulkInsertTask:DestinationConnectionName="{A08EB287-4FF5-428E-8550-DE0F44322DD3}"
+          BulkInsertTask:FieldTerminator="Comma {,}" xmlns:BulkInsertTask="www.microsoft.com/sqlserver/dts/tasks/bulkinserttask" />
+      </DTS:ObjectData>
+    </DTS:Executable>
+  </DTS:Executables>
+  <DTS:PrecedenceConstraints>
+    <DTS:PrecedenceConstraint
+      DTS:refId="Package.PrecedenceConstraints[Constraint]"
+      DTS:CreationName=""
+      DTS:DTSID="{62FA78E2-319C-4099-A444-188084F84111}"
+      DTS:From="Package\Execute SQL Task"
+      DTS:LogicalAnd="True"
+      DTS:ObjectName="Constraint"
+      DTS:To="Package\Olx Bulk Insert" />
+  </DTS:PrecedenceConstraints>
+  <DTS:DesignTimeProperties><![CDATA[<?xml version="1.0"?>
+<!--This CDATA section contains the layout information of the package. The section includes information such as (x,y) coordinates, width, and height.-->
+<!--If you manually edit this section and make a mistake, you can delete it. -->
+<!--The package will still be able to load normally but the previous layout information will be lost and the designer will automatically re-arrange the elements on the design surface.-->
+<Objects
+  Version="8">
+  <!--Each node below will contain properties that do not affect runtime behavior.-->
+  <Package
+    design-time-name="Package">
+    <LayoutInfo>
+      <GraphLayout
+        Capacity="4" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml">
+        <NodeLayout
+          Size="149.333333333334,42.6666666666667"
+          Id="Package\Olx Bulk Insert"
+          TopLeft="246.874988963828,50.6999975824357" />
+        <NodeLayout
+          Size="164,42.6666666666667"
+          Id="Package\Execute SQL Task"
+          TopLeft="38.7499982677402,53.9499974274636" />
+        <EdgeLayout
+          Id="Package.PrecedenceConstraints[Constraint]"
+          TopLeft="202.74999826774,73.658330838283">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="44.1249906960875,0"
+              Start="0,0"
+              End="36.6249906960875,0">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="36.6249906960875,0" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+      </GraphLayout>
+    </LayoutInfo>
+  </Package>
+</Objects>]]></DTS:DesignTimeProperties>
+</DTS:Executable>

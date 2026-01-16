@@ -1,0 +1,14 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs/OlxMda/v17/TestStore/0/000.testlog
+/.vs/OlxMda/v17/TestStore/0/testlog.manifest
+/.vs/ProjectSettings.json
+/.vs/slnx.sqlite
+/.vs/OlxMda/CopilotIndices/*
+/.vs/OlxMda/FileContentIndex/*
+/OlxIntegration/.vs/OlxIntegration
+/.vs
+/OlxIntegration/bin/Development
+/OlxIntegration/obj/Development
