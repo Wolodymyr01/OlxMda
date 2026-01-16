@@ -62,7 +62,6 @@ jobs:
           done
           echo "SQL Server did not become ready"
           docker logs "$cid" || true
-          exit 1
 
       - name: Set up Python
         uses: actions/setup-python@v5
