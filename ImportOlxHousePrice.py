@@ -15,6 +15,7 @@ from decimal import InvalidOperation
 CSV_FILE = "olx_house_price_Q122.csv"
 DEFAULT_SERVER = "."
 DEFAULT_DATABASE = "OlxQa"
+DEFAULT_STEP = "All"
 TABLE_NAME = "[dbo].[olx_house_price]"
 
 # Column mappings and type conversions
@@ -43,11 +44,11 @@ def _parse_float(value):
     """Parse float with locale-independent handling of commas and dots."""
     if not value or not isinstance(value, str):
         return None
-    
+
     value = value.strip()
     if not value:
         return None
-    
+
     try:
         # Replace comma with period (handle European decimal separator)
         normalized = value.replace(",", ".")
@@ -60,11 +61,11 @@ def _parse_int(value):
     """Parse integer with robust error handling."""
     if not value or not isinstance(value, str):
         return None
-    
+
     value = value.strip()
     if not value:
         return None
-    
+
     try:
         # Remove any decimal part if present
         return int(float(value.replace(",", ".")))
@@ -76,11 +77,11 @@ def _parse_tinyint(value):
     """Parse tinyint (0-255) with validation."""
     if not value or not isinstance(value, str):
         return None
-    
+
     value = value.strip()
     if not value:
         return None
-    
+
     try:
         int_val = int(float(value.replace(",", ".")))
         if 0 <= int_val <= 255:
@@ -93,17 +94,17 @@ def _parse_tinyint(value):
 def read_csv(filepath):
     """Read CSV file with proper handling of embedded commas."""
     print(f"Reading CSV file: {filepath}")
-    
+
     if not Path(filepath).exists():
         raise FileNotFoundError(f"CSV file not found: {filepath}")
-    
+
     rows = []
     with open(filepath, 'r', encoding='utf-8') as f:
         reader = csv.DictReader(f)
         for i, row in enumerate(reader, start=2):  # start=2 because row 1 is header
             rows.append((i, row))
-    
-    print(f"✓ Read {len(rows)} rows")
+
+    print(f"Read {len(rows)} rows")
     return rows
 
 
@@ -112,42 +113,42 @@ def validate_and_convert_row(row_num, row):
     converted = {}
     errors = []
     raw_values = {}
-    
+
     for col_name, col_def in COLUMN_DEFS.items():
         raw_value = row.get(col_name, "").strip() if col_name in row else ""
         raw_values[col_name] = raw_value
-        
+
         # Apply converter
         try:
             converted_value = col_def["converter"](raw_value)
         except Exception as e:
             converted_value = None
             errors.append(f"  {col_name}: {str(e)}")
-        
+
         # Check if required field has valid value
         if col_name in REQUIRED_FIELDS:
             if converted_value is None:
                 errors.append(f"  {col_name}: Missing or invalid (raw value: '{raw_value}')")
-        
+
         converted[col_name] = converted_value
-    
+
     is_valid = len(errors) == 0
     error_msg = "\n".join(errors) if errors else None
-    
+
     return converted, is_valid, error_msg, raw_values
 
 
 def insert_rows(cursor, rows):
     """Insert converted rows into database."""
     print("\nValidating and inserting data...")
-    
+
     inserted = 0
     rejected = 0
     rejected_samples = []
-    
+
     for row_num, row in rows:
         converted, is_valid, error_msg, raw_values = validate_and_convert_row(row_num, row)
-        
+
         if not is_valid:
             rejected += 1
             if len(rejected_samples) < 20:
@@ -157,7 +158,7 @@ def insert_rows(cursor, rows):
                     "raw_values": raw_values
                 })
             continue
-        
+
         # Insert row
         insert_sql = f"""
         INSERT INTO {TABLE_NAME} (
@@ -166,7 +167,7 @@ def insert_rows(cursor, rows):
             [population], [longitude], [latitude]
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """
-        
+
         values = (
             converted["price"],
             converted["price_per_meter"],
@@ -184,21 +185,21 @@ def insert_rows(cursor, rows):
             converted["longitude"],
             converted["latitude"]
         )
-        
+
         try:
             cursor.execute(insert_sql, values)
             inserted += 1
         except Exception as e:
             rejected += 1
             print(f"✗ Row {row_num}: {str(e)}")
-    
+
     cursor.commit()
-    
-    print(f"\n✓ Import Summary:")
+
+    print(f"\nImport Summary:")
     print(f"  Rows inserted: {inserted}")
     print(f"  Rows rejected: {rejected}")
     print(f"  Total rows: {inserted + rejected}")
-    
+
     if rejected_samples:
         print(f"\nSample of rejected rows (first {len(rejected_samples)}):")
         for sample in rejected_samples:
@@ -219,97 +220,111 @@ def insert_rows(cursor, rows):
 def execute_sql_file(cursor, filepath, description):
     """Execute SQL script from file."""
     print(f"\nExecuting {description}...")
-    
+
     if not Path(filepath).exists():
         raise FileNotFoundError(f"SQL file not found: {filepath}")
-    
+
     try:
         with open(filepath, 'r', encoding='utf-8') as f:
             sql_content = f.read()
-        
+
         # Split by GO statements (SQL Server batch separator, case-insensitive)
         # GO is not valid T-SQL, it's a command tool directive, so we need to remove it
         import re
         batches = re.split(r'\ngo\s*$', sql_content, flags=re.MULTILINE | re.IGNORECASE)
-        
+
         for batch in batches:
             batch = batch.strip()
             if batch:
                 cursor.execute(batch)
-        
+
         cursor.commit()
-        print(f"✓ {description} completed")
+        print(f"{description} completed")
     except Exception as e:
-        print(f"✗ Error executing {description}: {e}")
+        print(f"Error executing {description}: {e}")
         raise
 
 
-def main(server=None, database=None):
+def main(server=None, database=None, step=None):
     """Main execution."""
     try:
         # Use provided arguments or defaults
         sql_server = server or DEFAULT_SERVER
         sql_database = database or DEFAULT_DATABASE
-        
+        step_value = (step or DEFAULT_STEP).strip().lower()
+
+        valid_steps = {"all", "import", "schema", "data"}
+        if step_value not in valid_steps:
+            print(f"Invalid step, allowed: All, Import, Schema, Data")
+            return 1
+
+        do_import = step_value in ("all", "import")
+        do_schema = step_value in ("all", "schema")
+        do_data = step_value in ("all", "data")
+
         print("=" * 70)
         print("CSV to SQL Server Importer")
+        print(f"  Step: {step_value}")
         print("=" * 70)
-        
+
         # Connect to SQL Server
         print(f"\nConnecting to SQL Server...")
         print(f"  Server: {sql_server}")
         print(f"  Database: {sql_database}")
-        
+
         conn_string = f"Driver={{ODBC Driver 17 for SQL Server}};Server={sql_server};Database={sql_database};Trusted_Connection=yes;"
         conn = pyodbc.connect(conn_string)
         cursor = conn.cursor()
-        
+
         # Set locale-independent settings
         cursor.execute("SET LANGUAGE us_english")
         cursor.execute("SET DATEFORMAT mdy")
         cursor.execute("SET NOCOUNT ON")
         conn.commit()
-        print("✓ Connected")
-        
-        # Execute table setup script
-        execute_sql_file(cursor, "OlxImportTable.sql", "OlxImportTable.sql")
-        
-        # Read CSV
-        rows = read_csv(CSV_FILE)
-        
-        # Insert data
-        insert_rows(cursor, rows)
-        
-        # Execute schema script
-        execute_sql_file(cursor, "OlxSchema.sql", "OlxSchema.sql")
-        
-        # Execute data script
-        execute_sql_file(cursor, "OlxData.sql", "OlxData.sql")
-        
-        # Verify fact table is not empty
-        print("\nVerifying data...")
-        cursor.execute("SELECT COUNT(*) FROM FactOfferSnapshot")
-        fact_count = cursor.fetchone()[0]
-        
-        if fact_count > 0:
-            print(f"✓ Fact table contains {fact_count} records")
-        else:
-            print("✗ Fact table is empty!")
-            raise Exception("Fact table is empty after import")
-        
+        print("Connected")
+
+        # Import step (creates import table, reads CSV, inserts rows)
+        if do_import:
+            print("\n--- Running import step ---")
+            execute_sql_file(cursor, "OlxImportTable.sql", "OlxImportTable.sql")
+            rows = read_csv(CSV_FILE)
+            insert_rows(cursor, rows)
+
+        # Schema step
+        if do_schema:
+            print("\n--- Running schema step ---")
+            execute_sql_file(cursor, "OlxSchema.sql", "OlxSchema.sql")
+
+        # Data step
+        if do_data:
+            print("\n--- Running data step ---")
+            execute_sql_file(cursor, "OlxData.sql", "OlxData.sql")
+
+        # Verify fact table is not empty only if data step was executed
+        if do_data:
+            print("\nVerifying data...")
+            cursor.execute("SELECT COUNT(*) FROM FactOfferSnapshot")
+            fact_count = cursor.fetchone()[0]
+
+            if fact_count > 0:
+                print(f"Fact table contains {fact_count} records")
+            else:
+                print("Fact table is empty!")
+                raise Exception("Fact table is empty after import/schema/data steps")
+
         cursor.close()
         conn.close()
-        
+
         print("\n" + "=" * 70)
         print("Import completed successfully!")
         print("=" * 70)
         return 0
-        
+
     except pyodbc.Error as e:
-        print(f"\n✗ Database error: {e}")
+        print(f"\nDatabase error: {e}")
         return 1
     except Exception as e:
-        print(f"\n✗ Error: {e}")
+        print(f"\nError: {e}")
         return 1
 
 
@@ -317,6 +332,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Import OLX house price data to SQL Server")
     parser.add_argument("--server", default=DEFAULT_SERVER, help=f"SQL Server name (default: {DEFAULT_SERVER})")
     parser.add_argument("--database", default=DEFAULT_DATABASE, help=f"Database name (default: {DEFAULT_DATABASE})")
-    
+    parser.add_argument("--step", default=DEFAULT_STEP, help=f"Step to execute (default: {DEFAULT_STEP}). Valid: All, Import, Schema, Data")
+
     args = parser.parse_args()
-    sys.exit(main(args.server, args.database))
+    sys.exit(main(args.server, args.database, args.step))
