@@ -6,6 +6,18 @@
     <Name>OlxMda.database</Name>
     <FullPath>OlxMda.database</FullPath>
   </Database>
+  <Cubes>
+    <ProjectItem>
+      <Name>Olx Offers Snapshot.cube</Name>
+      <FullPath>Olx Offers Snapshot.cube</FullPath>
+      <Dependencies>
+        <ProjectItem>
+          <Name>Olx Offers Snapshot.partitions</Name>
+          <FullPath>Olx Offers Snapshot.partitions</FullPath>
+        </ProjectItem>
+      </Dependencies>
+    </ProjectItem>
+  </Cubes>
   <Dimensions>
     <ProjectItem>
       <Name>Dim Date.dim</Name>

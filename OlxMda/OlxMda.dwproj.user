@@ -7,22 +7,23 @@
           <ConfigurationSetting>
             <Id>Olx DW</Id>
             <Name>Olx DW</Name>
-            <Value xsi:type="xsd:string">AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAvNcPRTStxkSGF/qoxJVEWgAAAAAOAAAATwBsAHgAIABEAFcAAAAQZgAAAAEAACAAAAArfQz8JIhSTPVyBvF4nbPy4WVqjL1YbrwMpEFoxEIyoQAAAAAOgAAAAAIAACAAAABpFwCAv/6z+6QL1nBDjpFYbHOIJR07zLSxSAurLYoBEBAAAABuSMadR+IA9hQIJmn3bjj6QAAAANGTGEo9q3lvt9Gb9dIQI/FgsXmihrC1r6OEyTox10A56Sd904G36x++UPDyg85ELnXwND8aboUbGaayYhkhvRg=</Value>
+            <Value xsi:type="xsd:string">AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAYb0jqHfH+06a9Evyp33BTQAAAAAOAAAATwBsAHgAIABEAFcAAAAQZgAAAAEAACAAAAB5Q8GEdnSrbI7LyaKB0j0WZ10In+u2zDPPGmxRRbmW3AAAAAAOgAAAAAIAACAAAACO3Xssoe6NF7wvXKYU8+x7y4mAFEIwl3aKDWEBlIzBZxAAAACHgrsD0vLtmdKxNVNLEBwyQAAAAD44rPzXa1CSKZRZC0c0SfnUVPbbFHzYCKlW8FcJnbA3npIAfWYRuGDFXm1750CCav6SCFua85riDRoTYPT9RgI=</Value>
           </ConfigurationSetting>
         </UserIDs>
         <UserPasswords>
           <ConfigurationSetting>
             <Id>Olx DW</Id>
             <Name>Olx DW</Name>
-            <Value xsi:type="xsd:string">AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAvNcPRTStxkSGF/qoxJVEWgAAAAAOAAAATwBsAHgAIABEAFcAAAAQZgAAAAEAACAAAAALiZXKbTXMSBKdlzYslLCkSV/UnBl5S+0kELAmkhvL9AAAAAAOgAAAAAIAACAAAAClfHlPuguDBHPPTvEXUtcQxx2Qnx/BincoAf6VL0nwBDAAAACZ6S3hO6BP9njWPTN2SDg8rwSqczfRJPMvOVOIDdBy/blGKC44RTXdjR5KYysiezVAAAAATiWukoAiUp025sBkU9rwtjiiTyxu+TGwxdhqLtgxcwJEUIqjqTRc7b9lPJkOlHy/nkTZ7fPcBIcJJuVcctph/g==</Value>
+            <Value xsi:type="xsd:string">AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAYb0jqHfH+06a9Evyp33BTQAAAAAOAAAATwBsAHgAIABEAFcAAAAQZgAAAAEAACAAAADVcJ1XvjViip0CC0p8oNWa7m228skVgtinm2vX3Hk9xwAAAAAOgAAAAAIAACAAAACBUB/MEQ+2/6RjXCeZwd8c5V4OGnOlpzmk2aClTMkKvTAAAAAL3oI9BDM0HBTW2wkjiifuUew5bEvYyrvqTsEgo8YDtX589HeWh8zhEx1pp6VbOnVAAAAA610lJPn9orMKDQCGgeBnlAntLN1QlLAjOHO+FC0kOBsl9lgl/UuaZ8vEO1A1Wfi2SiQSrSGdXe87EdPNeOaX9w==</Value>
           </ConfigurationSetting>
         </UserPasswords>
-        <TargetServer>localhost</TargetServer>
-        <TargetDatabase>OlxMda</TargetDatabase>
+        <TargetServer>EPBYBREW0106\POMMERNSQL</TargetServer>
+        <TargetDatabase>OlxDW</TargetDatabase>
         <StartObject>
           <ObjectId></ObjectId>
           <ObjectType>Current</ObjectType>
         </StartObject>
+        <DeploymentMode>DeployAll</DeploymentMode>
       </Options>
     </Configuration>
   </Configurations>

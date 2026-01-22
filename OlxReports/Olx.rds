@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RptDataSource xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Name="Olx">
+  <ConnectionProperties>
+    <Extension>OLEDB-MD</Extension>
+    <ConnectString>Data Source=EPBYBREW0106\POMMERNSQL;Initial Catalog=OlxDW</ConnectString>
+  </ConnectionProperties>
+  <DataSourceID>ca8f2b3f-1d2b-4d99-a340-1cd91300763e</DataSourceID>
+</RptDataSource>
