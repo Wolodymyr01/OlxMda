@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RptDataSource xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Name="SQL OLTP">
+  <ConnectionProperties>
+    <Extension>SQL</Extension>
+    <ConnectString>Data Source="20.79.156.45, 1433";Initial Catalog=OlxDW</ConnectString>
+    <Prompt>Specify a user name and password for data source SQL OLTP:</Prompt>
+  </ConnectionProperties>
+  <DataSourceID>3a8c68d6-f9f5-49e9-adc2-97d0dc815953</DataSourceID>
+</RptDataSource>
