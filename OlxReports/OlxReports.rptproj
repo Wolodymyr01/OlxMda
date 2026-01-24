@@ -49,10 +49,18 @@
     <Reports>@(Report)</Reports>
   </PropertyGroup>
   <ItemGroup>
-    <DataSource Include="Olx.rds" />
+    <DataSet Include="Regions OLTP.rsd" />
   </ItemGroup>
   <ItemGroup>
-    <Report Include="OffersByRegion.rdl" />
+    <DataSource Include="Olx.rds" />
+    <DataSource Include="SQL OLTP.rds" />
+  </ItemGroup>
+  <ItemGroup>
+    <Report Include="Offers by cities.rdl" />
+    <Report Include="Offers by Month.rdl" />
+    <Report Include="Offers Overview.rdl" />
+    <Report Include="Prices in regions.rdl" />
+    <Report Include="Property categories.rdl" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Reporting Services\Microsoft.ReportingServices.MSBuilder.targets" />
 </Project>

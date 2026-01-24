@@ -3,6 +3,7 @@
   <ConnectionProperties>
     <Extension>OLEDB-MD</Extension>
     <ConnectString>Data Source=EPBYBREW0106\POMMERNSQL;Initial Catalog=OlxDW</ConnectString>
+    <IntegratedSecurity>true</IntegratedSecurity>
   </ConnectionProperties>
   <DataSourceID>ca8f2b3f-1d2b-4d99-a340-1cd91300763e</DataSourceID>
 </RptDataSource>
