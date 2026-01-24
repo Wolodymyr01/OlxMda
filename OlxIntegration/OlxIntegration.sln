@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36603.0 d17.14
+VisualStudioVersion = 17.14.36603.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{C9674DCB-5085-4A16-B785-4C70DD1589BD}") = "OlxIntegration", "OlxIntegration.dtproj", "{BFEB714D-57BD-7381-A849-5AC0111CBB17}"
 EndProject
@@ -16,13 +16,49 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		..\Readme.md = ..\Readme.md
 	EndProjectSection
 EndProject
+Project("{D2ABAB84-BF74-430A-B69E-9DC6D40DDA17}") = "OlxMda", "..\OlxMda\OlxMda.dwproj", "{FEC3AFA6-15AB-FD68-C613-E278C18888BC}"
+EndProject
+Project("{F14B399A-7131-4C87-9E4B-1186C45EF12D}") = "OlxReports", "..\OlxReports\OlxReports.rptproj", "{8C70B371-B758-7182-8ED2-B995FD8D7F5C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Default = Debug|Default
+		DebugLocal|Default = DebugLocal|Default
 		Development|Default = Development|Default
+		Release|Default = Release|Default
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BFEB714D-57BD-7381-A849-5AC0111CBB17}.Debug|Default.ActiveCfg = Development
+		{BFEB714D-57BD-7381-A849-5AC0111CBB17}.Debug|Default.Build.0 = Development
+		{BFEB714D-57BD-7381-A849-5AC0111CBB17}.DebugLocal|Default.ActiveCfg = Development
+		{BFEB714D-57BD-7381-A849-5AC0111CBB17}.DebugLocal|Default.Build.0 = Development
 		{BFEB714D-57BD-7381-A849-5AC0111CBB17}.Development|Default.ActiveCfg = Development
 		{BFEB714D-57BD-7381-A849-5AC0111CBB17}.Development|Default.Build.0 = Development
+		{BFEB714D-57BD-7381-A849-5AC0111CBB17}.Release|Default.ActiveCfg = Development
+		{BFEB714D-57BD-7381-A849-5AC0111CBB17}.Release|Default.Build.0 = Development
+		{FEC3AFA6-15AB-FD68-C613-E278C18888BC}.Debug|Default.ActiveCfg = Development
+		{FEC3AFA6-15AB-FD68-C613-E278C18888BC}.Debug|Default.Build.0 = Development
+		{FEC3AFA6-15AB-FD68-C613-E278C18888BC}.Debug|Default.Deploy.0 = Development
+		{FEC3AFA6-15AB-FD68-C613-E278C18888BC}.DebugLocal|Default.ActiveCfg = Development
+		{FEC3AFA6-15AB-FD68-C613-E278C18888BC}.DebugLocal|Default.Build.0 = Development
+		{FEC3AFA6-15AB-FD68-C613-E278C18888BC}.DebugLocal|Default.Deploy.0 = Development
+		{FEC3AFA6-15AB-FD68-C613-E278C18888BC}.Development|Default.ActiveCfg = Development
+		{FEC3AFA6-15AB-FD68-C613-E278C18888BC}.Development|Default.Build.0 = Development
+		{FEC3AFA6-15AB-FD68-C613-E278C18888BC}.Development|Default.Deploy.0 = Development
+		{FEC3AFA6-15AB-FD68-C613-E278C18888BC}.Release|Default.ActiveCfg = Development
+		{FEC3AFA6-15AB-FD68-C613-E278C18888BC}.Release|Default.Build.0 = Development
+		{FEC3AFA6-15AB-FD68-C613-E278C18888BC}.Release|Default.Deploy.0 = Development
+		{8C70B371-B758-7182-8ED2-B995FD8D7F5C}.Debug|Default.ActiveCfg = Debug
+		{8C70B371-B758-7182-8ED2-B995FD8D7F5C}.Debug|Default.Build.0 = Debug
+		{8C70B371-B758-7182-8ED2-B995FD8D7F5C}.Debug|Default.Deploy.0 = Debug
+		{8C70B371-B758-7182-8ED2-B995FD8D7F5C}.DebugLocal|Default.ActiveCfg = DebugLocal
+		{8C70B371-B758-7182-8ED2-B995FD8D7F5C}.DebugLocal|Default.Build.0 = DebugLocal
+		{8C70B371-B758-7182-8ED2-B995FD8D7F5C}.Development|Default.ActiveCfg = Release
+		{8C70B371-B758-7182-8ED2-B995FD8D7F5C}.Development|Default.Build.0 = Release
+		{8C70B371-B758-7182-8ED2-B995FD8D7F5C}.Development|Default.Deploy.0 = Release
+		{8C70B371-B758-7182-8ED2-B995FD8D7F5C}.Release|Default.ActiveCfg = Release
+		{8C70B371-B758-7182-8ED2-B995FD8D7F5C}.Release|Default.Build.0 = Release
+		{8C70B371-B758-7182-8ED2-B995FD8D7F5C}.Release|Default.Deploy.0 = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
